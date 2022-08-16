@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Current Expense Calculator</title>
+    <link href="./dist/output.css" rel="stylesheet" />
+  </head>
+  <body class="flex justify-center">
+    <main id="main" class="m-5 border h-screen">
+      <section id="input-section" class="flex space-x-2">
+        <div class="flex flex-col border p-1 h-24">
+          <label for="">Enter your Budget:</label>
+          <input
+            class="border m-2 p-1"
+            type="number"
+            id="incomeInput"
+            placeholder="Enter Budget"
+          />
+        </div>
+        <div class="border h-screen">
+          <div class="flex flex-col p-1">
+            <label for="date">Date and Time:</label>
+            <input
+              class="m-2 p-1 text-center"
+              type=""
+              placeholder="Date and Time"
+              id="date"
+              disabled
+            />
+          </div>
+          <p class="text-center" id="dateEl"></p>
+        </div>
+        <div class="border h-screen">
+          <div class="flex flex-col p-1">
+            <label for="">Purpose:</label>
+            <input
+              class="border m-2 p-1"
+              type="text"
+              class=""
+              id="purposeInput"
+              placeholder="Enter your purpose"
+            />
+          </div>
+          <div class="text-center" id="purposeEl"></div>
+        </div>
+        <div class="border h-screen">
+          <div class="flex flex-col p-1">
+            <label for="">Expense:</label>
+            <input
+              class="border m-2 p-1"
+              type="number"
+              class="form-control"
+              id="expenses"
+              placeholder="Enter your expense"
+            />
+          </div>
+          <div class="text-center" id="amountEl"></div>
+        </div>
+      </section>
+    </main>
+    <section id="display-section" class="border m-5 p-5 h-screen">
+      <div class="">
+        <div class="border p-2">
+          <h1>Budget:</h1>
+          <p id="income">0</p>
+        </div>
+      </div>
+      <div class="border mt-10 p-2">
+        <p>Total Expenses:</p>
+        <p id="total">0</p>
+      </div>
+      <div class="mt-10 border p-2">
+        <h1>Balance:</h1>
+        <p id="balance">0</p>
+      </div>
+      <button type="button" class="mt-10 p-2 bg-green-200" id="update">
+        Calculate Expenses
+      </button>
+      <button type="button" class="p-2 bg-red-200" id="delete">
+        Delete Row
+      </button>
+    </section>
+
+    <script src="./dist/index.js"></script>
+  </body>
+</html>
