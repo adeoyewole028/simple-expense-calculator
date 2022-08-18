@@ -1,7 +1,8 @@
 const deleteBtn = document.querySelector("#delete");
-const expenses = document.getElementById("expenses");
+const amount = document.getElementById("amount");
 const total = document.querySelector("#total");
 const dateEl = document.querySelector("#dateEl");
+const display = document.querySelector("#display");
 let amountEl = document.querySelector("#amountEl");
 const inputVal = document.querySelectorAll("input");
 let incomeInput = document.getElementById("incomeInput");
@@ -11,28 +12,9 @@ let purposeEl = document.querySelector("#purposeEl");
 let updateBtn = document.getElementById("update");
 let balanceEl = document.querySelector("#balance");
 
-// console.log(inputVal);
-
-const object = {};
-
-const amount = [];
+const listOfAmount = [];
 
 const dailyExpense = [];
-
-console.log(dailyExpense);
-
-function getNewArrayIndex(array) {
-  let object = [...Array(array.length)].map((_, i) => {
-    return {
-      index: i,
-      purpose: array[i].purpose,
-      amount: array[i].amount,
-      date: array[i].date,
-    };
-  });
-  console.log(object);
-}
-
 let sumOfExpenses = 0;
 
 //Add date and time
@@ -54,7 +36,7 @@ function getDate() {
   if (hour <= 9) {
     hour = "0" + hour;
   }
-  if (hour >= 12) {
+  if (hour > 12) {
     hour = hour - 12;
     hour = "0" + hour;
     time = `${day}/${month}/${year} ${hour}:${minutes}:${seconds} PM`;
@@ -72,130 +54,134 @@ function getDate() {
   }
 }
 
-// disable button if input is empty
-// function disableButton(input, button) {
-//   if (input.value === "") {
-//     button.disabled = true;
-//   } else {
-//     button.disabled = false;
-//   }
-// }
-
-// disableButton(expenses, updateBtn);
-// disableButton(incomeInput, updateBtn);
-// disableButton(purpose, updateBtn);
-
-// inputVal.forEach((inputs) => {
-//   disableButton(inputs, updateBtn);
-//   console.log(inputs);
-//   inputs.addEventListener("keyup", () => {
-//     disableButton(inputs, updateBtn);
-//   });
-// });
-
-// expenses.addEventListener("input", () => {
-//   disableButton(expenses, updateBtn);
-// });
-
-// incomeInput.addEventListener("input", () => {
-//   disableButton(incomeInput, updateBtn);
-// });
-
-// purpose.addEventListener("input", () => {
-//   disableButton(purpose, updateBtn);
-// });
-
-//get in put value
-function getInputValue(inputVal, element) {
+// disable update button if inputfield is empty
+// updateBtn.disabled = true;
+function disableUpdateBtn() {
   inputVal.forEach((input) => {
-    input.addEventListener("input", () => {
-      element.innerHTML = input.value;
+    input.addEventListener("keyup", () => {
+      if (
+        amount.value === "" ||
+        purpose.value === "" ||
+        incomeInput.value === ""
+      ) {
+        updateBtn.disabled = true;
+        return;
+      } else {
+        updateBtn.disabled = false;
+        return;
+      }
     });
-  }),
-    (element.innerHTML = inputVal.value);
+  });
+}
+// disableUpdateBtn();
+
+document.addEventListener("DOMContentLoaded", () => {
+  // Update daily expense
+  updateBtn.addEventListener("click", function () {
+    addExpense(dailyExpense);
+    getSum(listOfAmount); // get sum of expenses
+    console.log(listOfAmount);
+    total.textContent = sumOfExpenses; // display sum of expenses
+
+    let monthlyIncome = +incomeInput.value; // get monthly income
+    getBalance(monthlyIncome, sumOfExpenses, balanceEl);
+
+    setLocalStorageData(dailyExpense, (string = "expenses"));
+    getLocalStorage((string = "expenses"));
+    // localStorage.setItem("expense", JSON.stringify(expenses));
+
+    // let fromLocalStorage = JSON.parse(localStorage.getItem("expense"));
+
+    // console.log(fromLocalStorage);
+  });
+
+  deleteBtn.addEventListener("click", function () {
+    if (dailyExpense.length === 0) {
+      return;
+    }
+
+    amountEl.removeChild(amountEl.lastChild);
+    purposeEl.removeChild(purposeEl.lastChild);
+    dateEl.removeChild(dateEl.lastChild);
+
+    listOfAmount.splice(-1); // remove last element from array
+    getSubtract(listOfAmount);
+    total.textContent = sumOfExpenses;
+
+    let monthlyIncome = +incomeInput.value;
+    getBalance(monthlyIncome, sumOfExpenses, balanceEl);
+  });
+});
+
+function setLocalStorageData(array, string = "") {
+  localStorage.setItem(string, JSON.stringify(array));
+  console.log(array);
 }
 
-// Update daily expense
-updateBtn.addEventListener("click", function () {
-  object.amount = expenses.value; // amountEl.value;
-  object.purpose = purpose.value; // purposeEl.value;
-  object.date = getDate();
+function getLocalStorage(string = "") {
+  let fromLocalStorage = JSON.parse(localStorage.getItem(string));
+  console.log(fromLocalStorage);
+}
 
-  for (let key in object) {
-    // loop through object
+function deleteLocalStorage(string = "") {
+  localStorage.removeItem(string);
+}
+
+function addExpense(array) {
+  const expenses = {
+    id: array.length + 1,
+    amount: +amount.value, // "+" sign converts string to number
+    purpose: purpose.value,
+    date: getDate(),
+  };
+
+  if (amount.value === "" && purpose.value === "") {
+    console.log("empty");
+    return;
+  } else {
+    array.push(expenses);
+    listOfAmount.push(expenses.amount); // add amount to array
+    console.log(array);
+  }
+
+  for (key in expenses) {
     if (key === "amount") {
-      // if key is amount
       let amountKey = document.createElement("p");
-      addExpense(dailyExpense, expenses, object); // add expense to array
-      amount.push(object[key]); // amount.push(amountEl.value);
-      amountKey.innerHTML = object[key];
+      amountKey.innerHTML = expenses[key];
       amountEl.appendChild(amountKey);
-      object.amount = expenses.value; // amountEl.value;
-      expenses.value = "";
-
-      console.log(object[key]);
+      console.log(expenses[key]);
+      amount.value = "";
     } else if (key === "date") {
       let dateKey = document.createElement("p");
-      dateKey.innerHTML = object[key];
+      dateKey.innerHTML = expenses[key];
       dateEl.appendChild(dateKey);
-    } else if (expenses.value === "" && purpose.value === "") {
-      console.log("empty");
-      // dateKey.innerHTML = "";
-      object.date = "";
-      // disableButton();
-    } else {
+    } else if (key === "purpose") {
       let purposeKey = document.createElement("p");
-      purposeKey.innerHTML = object[key]; // purposeEl.value;
+      purposeKey.innerHTML = expenses[key];
       purposeEl.appendChild(purposeKey);
       purpose.value = "";
     }
   }
-  getSum(amount); // get sum of expenses
-  total.textContent = sumOfExpenses; // display sum of expenses
 
-  let monthlyIncome = +incomeInput.value; // convert string to number
-  getBalance(monthlyIncome, sumOfExpenses, balanceEl);
-});
-
-function addExpense(array, expense, obj) {
-  array.push(obj); // add object to array
-  getNewArrayIndex(array);
   console.log(array);
-  console.log(obj);
-  console.log(amount);
+  console.log(expenses);
 }
-
-deleteBtn.addEventListener("click", function () {
-  amountEl.removeChild(amountEl.lastChild);
-  purposeEl.removeChild(purposeEl.lastChild);
-  dateEl.removeChild(dateEl.lastChild);
-
-  amount.splice(-1);
-  getSubtract(amount);
-  total.textContent = sumOfExpenses;
-
-  let monthlyIncome = +incomeInput.value; // convert string to number
-  getBalance(monthlyIncome, sumOfExpenses, balanceEl);
-});
 
 // Get monthly income
 function getUserInputs(inputVal, element) {
-  let userInput = +inputVal.value; // convert string to number
+  let userInput = +inputVal.value;
   element.textContent = userInput;
 }
 
 // Display monthly income
 incomeInput.addEventListener("keyup", function (e) {
-  console.log("keydown");
   getUserInputs(incomeInput, incomeEl);
-
-  // disableButton(incomeInput, updateBtn);
 });
 
 // Sum of expenses
 function getSum(array) {
   sumOfExpenses = array.reduce(
-    (acc, curr) => +acc + +curr, // + sign converts string to number
+    (acc, curr) => acc + curr,
 
     0
   );
@@ -209,7 +195,7 @@ function getSubtract(array) {
     0
   );
   if (sumOfExpenses < 0) {
-    sumOfExpenses *= -1;
+    sumOfExpenses *= -1; // make negative number positive
   }
   console.log(sumOfExpenses);
 }
